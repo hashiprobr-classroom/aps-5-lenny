@@ -7,16 +7,13 @@ import java.util.List;
 public class Item {
     private String nome;
     private double minimo;
-    private List<LocalDateTime> momentos;
-    private List<Comprador> compradores;
-    private List<Double> ofertas;
+    private List<Lance> lances;
+
 
     public Item(String nome, double minimo) {
         this.nome = nome;
         this.minimo = minimo;
-        this.momentos = new ArrayList<>();
-        this.compradores = new ArrayList<>();
-        this.ofertas = new ArrayList<>();
+        this.lances = new ArrayList<>();
     }
 
     public String getNome() {
@@ -28,36 +25,34 @@ public class Item {
             return;
         }
 
-        if (!ofertas.isEmpty()) {
-            int maior = 0;
-            for (int i = 1; i < ofertas.size(); i++) {
-                if (ofertas.get(maior) < ofertas.get(i)) {
-                    maior = i;
-                }
-            }
-            if (oferta <= ofertas.get(maior)) {
+        if (!lances.isEmpty()) {
+            int maior = indiceDaMaiorOferta();
+            if (oferta <= lances.get(maior).getOferta()) {
                 return;
             }
         }
 
-        momentos.add(LocalDateTime.now());
-        compradores.add(comprador);
-        ofertas.add(oferta);
+        lances.add(new Lance(comprador,oferta));
 
         comprador.incrementa();
     }
 
     public void imprimeMelhorLance() {
-        if (ofertas.isEmpty()) {
+        if (lances.isEmpty()) {
             System.out.println("Nenhum lance foi feito ainda!");
         } else {
-            int maior = 0;
-            for (int i = 1; i < ofertas.size(); i++) {
-                if (ofertas.get(maior) < ofertas.get(i)) {
-                    maior = i;
-                }
-            }
-            System.out.println(compradores.get(maior) + " ofereceu " + ofertas.get(maior) + " (" + momentos.toString() + ")");
+            int maior = indiceDaMaiorOferta();
+            System.out.println(lances.get(maior).getComprador() + " ofereceu " + lances.get(maior).getOferta() + " (" + lances.get(maior).getMomento().toString() + ")");
         }
+    }
+    private int indiceDaMaiorOferta() {
+        int maior = 0;
+
+        for (int i = 1; i < lances.size(); i++) {
+            if (lances.get(maior).getOferta() < lances.get(i).getOferta()) {
+                maior = i;
+            }
+        }
+        return maior;
     }
 }
